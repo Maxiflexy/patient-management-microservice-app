@@ -3,13 +3,16 @@ package com.maxiflexy.patientservice.service;
 import com.maxiflexy.patientservice.dto.request.PatientRequestDTO;
 import com.maxiflexy.patientservice.dto.response.PatientResponseDTO;
 import com.maxiflexy.patientservice.exception.EmailAlreadyExistsException;
+import com.maxiflexy.patientservice.exception.PatientNotFoundException;
 import com.maxiflexy.patientservice.mapper.PatientMapper;
 import com.maxiflexy.patientservice.model.Patient;
 import com.maxiflexy.patientservice.repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -29,10 +32,33 @@ public class PatientServiceImpl implements PatientService{
     public PatientResponseDTO createPatient(PatientRequestDTO patientRequestDTO){
 
         if(patientRepository.existsByEmail(patientRequestDTO.getEmail())) {
-            throw new EmailAlreadyExistsException("A patient with this email already exists :" + patientRequestDTO.getEmail());
+            throw new EmailAlreadyExistsException(
+                    "A patient with this email already exists :" + patientRequestDTO.getEmail()
+            );
         }
         var newPatient = patientRepository.save(PatientMapper.toPatientModel(patientRequestDTO));
 
         return PatientMapper.toDTO(newPatient);
+    }
+
+    @Override
+    public PatientResponseDTO updatePatient(UUID id, PatientRequestDTO patientRequestDTO) {
+        var patient = patientRepository.findById(id).orElseThrow(
+                () -> new PatientNotFoundException("Patient not found with ID: " + id)
+        );
+
+        if(patientRepository.existsByEmail(patientRequestDTO.getEmail())) {
+            throw new EmailAlreadyExistsException(
+                    "A patient with this email already exists :" + patientRequestDTO.getEmail()
+            );
+        }
+
+        patient.setName(patientRequestDTO.getName());
+        patient.setAddress(patientRequestDTO.getAddress());
+        patient.setEmail(patientRequestDTO.getEmail());
+        patient.setDateOfBirth(LocalDate.parse(patientRequestDTO.getDateOfBirth()));
+
+        var updatedPatient = patientRepository.save(patient);
+        return PatientMapper.toDTO(updatedPatient);
     }
 }
