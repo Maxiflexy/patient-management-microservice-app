@@ -1,5 +1,6 @@
 package com.maxiflexy.patientservice.service;
 
+import com.maxiflexy.patientservice.dto.request.PatientRequestDTO;
 import com.maxiflexy.patientservice.dto.response.PatientResponseDTO;
 import com.maxiflexy.patientservice.mapper.PatientMapper;
 import com.maxiflexy.patientservice.model.Patient;
@@ -21,5 +22,12 @@ public class PatientServiceImpl implements PatientService{
 
         return patients.stream()
                 .map(PatientMapper::toDTO).toList();
+    }
+
+    @Override
+    public PatientResponseDTO createPatient(PatientRequestDTO patientRequestDTO){
+        var newPatient = patientRepository.save(PatientMapper.toPatientModel(patientRequestDTO));
+
+        return PatientMapper.toDTO(newPatient);
     }
 }
