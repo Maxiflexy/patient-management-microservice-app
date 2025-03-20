@@ -2,10 +2,13 @@ package com.maxiflexy.patientservice.controller;
 
 import com.maxiflexy.patientservice.dto.request.PatientRequestDTO;
 import com.maxiflexy.patientservice.dto.response.PatientResponseDTO;
+import com.maxiflexy.patientservice.dto.validators.CreatePatientValidationGroup;
 import com.maxiflexy.patientservice.service.PatientService;
 import jakarta.validation.Valid;
+import jakarta.validation.groups.Default;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,7 +29,7 @@ public class PatientController {
 
     @PostMapping
     public ResponseEntity<PatientResponseDTO> createPatient(
-            @Valid @RequestBody
+            @Validated({Default.class, CreatePatientValidationGroup.class}) @RequestBody
             PatientRequestDTO patientRequestDTO){
 
         return ResponseEntity.ok().body(patientService.createPatient(patientRequestDTO));
@@ -34,9 +37,15 @@ public class PatientController {
 
     @PutMapping("/{id}")
     public ResponseEntity<PatientResponseDTO> updatePatient(@PathVariable UUID id,
-        @RequestBody PatientRequestDTO patientRequestDTO){
+        @Validated({Default.class}) @RequestBody PatientRequestDTO patientRequestDTO){
 
         return ResponseEntity.ok().body(patientService.updatePatient(id, patientRequestDTO));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePatient(@PathVariable UUID id){
+        patientService.deletePatient(id);
+        return ResponseEntity.noContent().build();
     }
 
 }
