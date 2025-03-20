@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-//@Builder
+@Builder
 public class PatientResponseDTO {
     private String id;
     private String name;
