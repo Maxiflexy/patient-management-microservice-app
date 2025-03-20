@@ -2,6 +2,7 @@ package com.maxiflexy.patientservice.service;
 
 import com.maxiflexy.patientservice.dto.request.PatientRequestDTO;
 import com.maxiflexy.patientservice.dto.response.PatientResponseDTO;
+import com.maxiflexy.patientservice.exception.EmailAlreadyExistsException;
 import com.maxiflexy.patientservice.mapper.PatientMapper;
 import com.maxiflexy.patientservice.model.Patient;
 import com.maxiflexy.patientservice.repository.PatientRepository;
@@ -26,6 +27,10 @@ public class PatientServiceImpl implements PatientService{
 
     @Override
     public PatientResponseDTO createPatient(PatientRequestDTO patientRequestDTO){
+
+        if(patientRepository.existsByEmail(patientRequestDTO.getEmail())) {
+            throw new EmailAlreadyExistsException("A patient with this email already exists :" + patientRequestDTO.getEmail());
+        }
         var newPatient = patientRepository.save(PatientMapper.toPatientModel(patientRequestDTO));
 
         return PatientMapper.toDTO(newPatient);
