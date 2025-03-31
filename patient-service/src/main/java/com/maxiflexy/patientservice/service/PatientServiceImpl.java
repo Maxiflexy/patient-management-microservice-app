@@ -5,6 +5,7 @@ import com.maxiflexy.patientservice.dto.response.PatientResponseDTO;
 import com.maxiflexy.patientservice.exception.EmailAlreadyExistsException;
 import com.maxiflexy.patientservice.exception.PatientNotFoundException;
 import com.maxiflexy.patientservice.grpc.BillingServiceGrpcClient;
+import com.maxiflexy.patientservice.kafka.KafkaProducer;
 import com.maxiflexy.patientservice.mapper.PatientMapper;
 import com.maxiflexy.patientservice.model.Patient;
 import com.maxiflexy.patientservice.repository.PatientRepository;
@@ -21,6 +22,7 @@ public class PatientServiceImpl implements PatientService{
 
     private final PatientRepository patientRepository;
     private final BillingServiceGrpcClient billingServiceGrpcClient;
+    private final KafkaProducer kafkaProducer;
 
     @Override
     public List<PatientResponseDTO> getPatients(){
@@ -42,6 +44,8 @@ public class PatientServiceImpl implements PatientService{
 
         billingServiceGrpcClient.createBillingAccount(newPatient.getId().toString(),
                 newPatient.getName(), newPatient.getEmail());
+
+        kafkaProducer.sendEvent(newPatient);
 
         return PatientMapper.toDTO(newPatient);
     }

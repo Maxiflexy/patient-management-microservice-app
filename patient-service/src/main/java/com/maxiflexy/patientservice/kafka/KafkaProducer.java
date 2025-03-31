@@ -4,10 +4,12 @@ import com.maxiflexy.patientservice.model.Patient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.stereotype.Service;
 import patient.events.PatientEvent;
 
 @RequiredArgsConstructor
 @Slf4j
+@Service
 public class KafkaProducer {
 
     private final KafkaTemplate<String, byte[]> kafkaTemplate;
